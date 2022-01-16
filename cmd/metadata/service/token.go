@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"github.com/dipdup-net/metadata/cmd/metadata/util"
 	"sync"
 	"time"
 
@@ -106,6 +107,12 @@ func (s *TokenService) manager(ctx context.Context) {
 					if err == nil {
 						tokens[i].Status = models.StatusApplied
 						tokens[i].Metadata = link.Data
+						tweeID, creatorID, err := util.ParseTweetFromMetadata(tokens[i].Metadata)
+						if err != nil {
+							log.Err(err).Msg("failed to parse tweet metadata")
+						}
+						tokens[i].TweetID = tweeID
+						tokens[i].CreatorID = creatorID
 						tokens[i].RetryCount += 1
 						s.result <- &tokens[i]
 						continue
@@ -197,7 +204,6 @@ func (s *TokenService) worker(ctx context.Context) {
 			if err := s.handler(resolveCtx, unresolved); err != nil {
 				log.Err(err).Msg("resolve token")
 			}
-
 			s.result <- unresolved
 		}
 	}

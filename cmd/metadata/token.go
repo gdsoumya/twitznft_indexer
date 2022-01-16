@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	stdJSON "encoding/json"
 	"fmt"
+	"github.com/dipdup-net/metadata/cmd/metadata/util"
 	"net/url"
 	"unicode/utf8"
 
@@ -146,7 +147,12 @@ func (indexer *Indexer) resolveTokenMetadata(ctx context.Context, tm *models.Tok
 		if err != nil {
 			return err
 		}
-
+		tweetID, creatorID, err := util.ParseTweetFromMetadata(metadata)
+		if err != nil {
+			return fmt.Errorf("failed to parse tweet metadata, error=%w", err)
+		}
+		tm.TweetID = tweetID
+		tm.CreatorID = creatorID
 		tm.Metadata = helpers.Escape(metadata)
 		if utf8.Valid(metadata) {
 			tm.Status = models.StatusApplied

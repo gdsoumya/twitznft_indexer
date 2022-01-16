@@ -1,4 +1,21 @@
-version: 0.0.1
+version: 1.2
+package: twitznft-indexer
+
+contracts:
+  twitz_mainnet:
+    address: KT1KJ2sLUBu3y5aLh56wTMbSS72MVCqkRY2j
+    typename: nft_mainnet
+  twitz_testnet:
+    address: KT1KJ2sLUBu3y5aLh56wTMbSS72MVCqkRY2j
+    typename: nft
+
+datasources:
+  tzkt_testnet:
+    kind: tzkt
+    url: https://api.hangzhou2net.tzkt.io
+  tzkt_mainnet:
+    kind: tzkt
+    url: https://api.tzkt.io
 
 metadata:
   settings:
@@ -8,42 +25,26 @@ metadata:
         - https://ipfs.infura.io
         - https://dweb.link
         - https://ipfs.io
-      timeout: 5
-      fallback: https://ipfs.baking-bad.org
+      timeout: 15
+      fallback: https://ipfs.infura.io
       pinning:
-    http_timeout: 5
+    http_timeout: 10
     max_retry_count_on_error: 3
-    contract_service_workers: 15
-    token_service_workers: 25
-    max_cpu: 4
-    aws:
-    thumbnail:
-      max_file_size_mb: 100
-      workers: 20
-      size: 100
-      timeout: 20
+    contract_service_workers: 1
+    token_service_workers: 10
   indexers:
-    mainnet:
-      datasources:
-        tzkt: https://api.tzkt.io
     hangzhounet:
+      filters:
+        accounts:
+          - ${CONTRACT_ALIAS}
       datasources:
-        tzkt: https://api.hangzhou2net.tzkt.io
+        tzkt: ${DATASOURCE}
 
 database:
   kind: postgres
-  host: ${POSTGRES_HOST:-db}
+  host: 127.0.0.1
   port: 5432
-  user: ${POSTGRES_USER:-dipdup}
-  password: ${POSTGRES_PASSWORD:-changeme}
-  database: ${POSTGRES_DB:-dipdup}
-
-hasura:
-  url: http://${HASURA_HOST:-hasura}:8080
-  admin_secret: ${ADMIN_SECRET:-changeme}
-  select_limit: 10000
-  allow_aggregation: false
-  rest: true
-
-prometheus:
-  url: ${EXPORT_HOST:-0.0.0.0}:2112
+  user: ${POSTGRES_USER}
+  password: ${POSTGRES_PASSWORD}
+  database: ${DB_NAME}
+  schema_name: public

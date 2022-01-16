@@ -143,7 +143,7 @@ func (db *RelativeDatabase) UpdateTokenMetadata(ctx context.Context, metadata []
 		return nil
 	}
 
-	_, err := db.DB().Model(&metadata).Column("metadata", "update_id", "status", "retry_count", "link").WherePK().Update()
+	_, err := db.DB().Model(&metadata).Column("metadata", "update_id", "status", "retry_count", "link", "tweet_id", "creator_id").WherePK().Update()
 	return err
 }
 
@@ -258,12 +258,22 @@ func (db *RelativeDatabase) CreateIndices() error {
 		return err
 	}
 	if _, err := db.DB().Exec(`
+		 ALTER TABLE token_metadata DROP CONSTRAINT token_metadata_pkey,ADD PRIMARY KEY(network, contract, token_id)
+	`); err != nil {
+		return err
+	}
+	if _, err := db.DB().Exec(`
 		CREATE INDEX CONCURRENTLY IF NOT EXISTS token_metadata_network_status_idx ON token_metadata (network, status)
 	`); err != nil {
 		return err
 	}
 	if _, err := db.DB().Exec(`
 		CREATE INDEX CONCURRENTLY IF NOT EXISTS token_metadata_sort_idx ON token_metadata (retry_count, updated_at)
+	`); err != nil {
+		return err
+	}
+	if _, err := db.DB().Exec(`
+		CREATE INDEX CONCURRENTLY IF NOT EXISTS token_metadata_tweet_idx ON token_metadata (tweet_id, contract, network)
 	`); err != nil {
 		return err
 	}

@@ -20,6 +20,8 @@ type TokenMetadata struct {
 	Network        string          `gorm:"primaryKey" json:"network" pg:",unique:token"`
 	Contract       string          `gorm:"primaryKey" json:"contract" pg:",unique:token"`
 	Link           string          `json:"link"`
+	TweetID        string          `json:"tweet_id"`
+	CreatorID      string          `json:"creator_id"`
 	Metadata       JSONB           `json:"metadata,omitempty" pg:",type:jsonb,use_zero"`
 	RetryCount     int8            `gorm:"type:SMALLINT;default:0" json:"retry_count" pg:",use_zero"`
 	Status         Status          `gorm:"type:SMALLINT" json:"status"`
